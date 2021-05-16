@@ -12,9 +12,15 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import griddata
 
 def init_phi(phi_func):
+    #defines phi in this world - dangerous style of doing things
+    #like, does the phi definition persist over different notebooks etc
     global phi
     def phi(x):
         return phi_func(x)
+
+def acc_phi(x):
+    #lets you access pho from outside
+    return phi(x)
 
 def normDist(z):
     #this is for the intergral measures
@@ -30,7 +36,7 @@ def qSSnext(sigmaW, sigmaB, dropout, qSSprev, integral_range = 10):
     intergral = quad(f, -integral_range, integral_range)
     return (1/dropout)*(sigmaW**2) * intergral[0] + (sigmaB**2)
 
-def qSSstar(sigmaW, sigmaB, dropout, qSSprev, steps_till_convergence = 100):
+def qSSstar(sigmaW, sigmaB, dropout, qSSprev = 10, steps_till_convergence = 500):
     #works out the limiting length of the vector given the previous length and the parameters
     #we're generally assuming the limit is reached within 100 steps
     qSStemp = qSSprev
@@ -67,8 +73,7 @@ def corr_map(sigmaW, sigmaB, dropout, corr_prev):
     #so we get the the new correlation, given a correlation, the only other things
     #that matter are the sigmas, since we just use the convergent length, that only depends on sigmaW sigmaB and dropout
 
-    some_random_length = 10 # doesn't make a difference as qSSstar limits to same value, hopefully?!
-    qSSstar_val = qSSstar(sigmaW, sigmaB, dropout, some_random_length)
+    qSSstar_val = qSSstar(sigmaW, sigmaB, dropout)
 
     q_AB = qAB_next(sigmaW, sigmaB, qSSstar_val, qSSstar_val, corr_prev)
 
